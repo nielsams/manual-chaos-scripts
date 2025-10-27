@@ -25,6 +25,7 @@ def main():
     #
     # Experiment 1: Block Network access between two subnets
     if False:
+        # Update these config values:
         vnet = "niels-test-vnet"
         subnet_source = "SubnetA"
         subnet_dest = "SubnetB"
@@ -43,7 +44,9 @@ def main():
     #
     # Experiment 2: AKS Zone Down Simulation
     if False:
+        # Update these config values:
         cluster_name = "niels-aks-test-1"
+
         logger.info("Experiment 2: Simulate AKS zone down.")
         success = aks_zone_down(resource_group, cluster_name, target_zone="1")
 
@@ -57,14 +60,16 @@ def main():
     #
     # Experiment 3: Postgres Failover
     if True:
+        # Update these config values:
         database_name = "niels-test-pgdb"
+
         logger.info("Experiment 3: Simulate PostgreSQL failover.")
-        success = postgres_failover(resource_group, database_name, force_failover=False)
+        success = postgres_failover(resource_group, database_name, forced_failover=True)
 
         if success:
-            logger.info("PostgreSQL failover simulation completed successfully")
+            logger.info("PostgreSQL failover completed successfully")
         else:
-            logger.error("PostgreSQL failover simulation failed")
+            logger.error("PostgreSQL failover failed")
 
 
     #
