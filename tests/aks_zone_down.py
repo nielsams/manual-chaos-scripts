@@ -2,7 +2,7 @@
 
 import logging
 import json
-from tests.utils import run_azure_cli
+from tests.utils import run_command
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +33,7 @@ def aks_zone_down(resource_group: str, cluster_name: str, target_zone: str) -> b
             f"--query nodeResourceGroup "
             f"-o tsv"
         )
-        node_rg, return_code = run_azure_cli(show_cluster_cmd)
+        node_rg, return_code = run_command(show_cluster_cmd)
         logger.debug(f"Node resource group command output: {node_rg}")
 
         if return_code != 0:
@@ -49,7 +49,7 @@ def aks_zone_down(resource_group: str, cluster_name: str, target_zone: str) -> b
             f"--cluster-name {cluster_name} "
             f"-o json"
         )
-        nodepools_output, return_code = run_azure_cli(list_nodepools_cmd)
+        nodepools_output, return_code = run_command(list_nodepools_cmd)
         logger.debug(f"Node pools command output: {nodepools_output}")
         
         if return_code != 0:
@@ -71,7 +71,7 @@ def aks_zone_down(resource_group: str, cluster_name: str, target_zone: str) -> b
                 f"--query \"[?contains(name, '{nodepool['name']}')].name\" "
                 f"-o tsv"
             )
-            vmss_output, return_code = run_azure_cli(list_vmss_cmd)
+            vmss_output, return_code = run_command(list_vmss_cmd)
             
             if return_code != 0:
                 logger.warning(f"Failed to list VMSS for node pool '{nodepool['name']}'")
@@ -94,7 +94,7 @@ def aks_zone_down(resource_group: str, cluster_name: str, target_zone: str) -> b
                 f"--query \"[?zones[0]=='{target_zone}'].osProfile.computerName\" "
                 f"-o tsv"
             )
-            instances_output, return_code = run_azure_cli(list_instances_cmd)
+            instances_output, return_code = run_command(list_instances_cmd)
             
             if return_code != 0:
                 logger.warning(f"Failed to list instances for VMSS '{vmss_name}'")
@@ -113,7 +113,7 @@ def aks_zone_down(resource_group: str, cluster_name: str, target_zone: str) -> b
                     f"--nodepool-name {nodepool['name']} "
                     f"--machine-names {' '.join(machine_names)}"
                 )
-                _, return_code = run_azure_cli(delete_machines_cmd)
+                _, return_code = run_command(delete_machines_cmd)
                 
                 if return_code != 0:
                     logger.error(f"Failed to delete machines in node pool '{nodepool['name']}'")

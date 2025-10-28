@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import logging
 import json
-from tests.utils import run_azure_cli
+from tests.utils import run_command, kubectl_installed, get_aks_credentials
 
 logger = logging.getLogger(__name__)
 
@@ -21,16 +21,12 @@ def aks_kill_pods(resource_group: str, cluster_name: str, namespace_name: str, l
     """
 
     try:
-        # Get AKS credentials
-        get_credentials_cmd = (
-            f"az aks get-credentials "
-            f"--resource-group {resource_group} "
-            f"--name {cluster_name} "
-            f"--overwrite-existing"
-        )
-        output, return_code = run_azure_cli(get_credentials_cmd)
-        if return_code != 0:
-            logger.error(f"Failed to get AKS credentials: {output}")
+        if not get_aks_credentials(resource_group, cluster_name):
+            logger.error(f"Failed to get AKS credentials.")
+            return False
+        
+        if not kubectl_installed():
+            logger.error(f"kubectl is not installed or not configured properly.")
             return False
 
         # Construct the kubectl command to delete pods by label
@@ -45,7 +41,7 @@ def aks_kill_pods(resource_group: str, cluster_name: str, namespace_name: str, l
             delete_pod_cmd += "--grace-period=0 --force "
 
         logger.debug(f"Executing command: {delete_pod_cmd}")
-        output, return_code = run_azure_cli(delete_pod_cmd)
+        output, return_code = run_command(delete_pod_cmd)
         if return_code != 0:
             logger.error(f"Failed to delete pods: {output}")
             return False

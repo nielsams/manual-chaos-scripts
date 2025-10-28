@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import logging
 import json
-from tests.utils import run_azure_cli
+from tests.utils import run_command
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +27,7 @@ def postgres_failover(resource_group: str, database_name: str, forced_failover: 
             f"--name {database_name} "
             f"-o json"
         )
-        db_output, return_code = run_azure_cli(get_db_cmd)
+        db_output, return_code = run_command(get_db_cmd)
         
         if return_code != 0:
             logger.error(f"Failed to retrieve database '{database_name}' in resource group '{resource_group}'")
@@ -57,7 +57,7 @@ def postgres_failover(resource_group: str, database_name: str, forced_failover: 
                 f"--failover Planned"
             )
         logger.debug(f"Executing failover command: {failover_cmd}")
-        _, return_code = run_azure_cli(failover_cmd)
+        _, return_code = run_command(failover_cmd)
         
         if return_code != 0:
             logger.error(f"Failed to failover database '{database_name}'")

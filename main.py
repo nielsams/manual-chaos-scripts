@@ -6,6 +6,7 @@ from tests.block_network_access import block_network_access
 from tests.aks_zone_down import aks_zone_down
 from tests.postgres_failover import postgres_failover
 from tests.aks_kill_pods import aks_kill_pods
+from tests.aks_container_network_partition import aks_container_network_partition
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -25,7 +26,7 @@ def main():
     #
     #
     # Experiment 1: Kill Pods in AKS Cluster
-    if True:
+    if False:
         # Update these config values:
         cluster_name = "niels-aks-test-1"
         namespace_name = "chaos-test"
@@ -74,6 +75,26 @@ def main():
             logger.info("Network blocking experiment completed successfully")
         else:
             logger.error("Network blocking experiment failed")    
+
+
+    #
+    #
+    # Experiment 4: Container Network Partition in AKS
+    if True:
+        # Update these config values:
+        cluster_name = "niels-aks-test-1"
+        namespace_name = "hello-world"
+        isolated_zone = 1
+        block_duration = 60 # seconds
+
+        # Note that this will install Chaos Mesh if not already installed
+        logger.info("Experiment 4: Simulate container network faults in AKS.")
+        success = aks_container_network_partition(resource_group, cluster_name, namespace_name, isolated_zone, block_duration)
+
+        if success:
+            logger.info("AKS container network faults experiment completed successfully")
+        else:
+            logger.error("AKS container network faults experiment failed")
 
 
     #

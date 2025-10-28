@@ -2,7 +2,7 @@
 
 import time
 import logging
-from tests.utils import run_azure_cli
+from tests.utils import run_command
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +30,7 @@ def block_network_access(resource_group: str, vnet: str, subnet_source: str, sub
         
         # Get all NSGs associated with the source subnet:
         get_nsg_cmd = f"az network vnet subnet show --resource-group {resource_group} --vnet-name {vnet} --name {subnet_source} --query \"networkSecurityGroup.id\" -o tsv"
-        nsg_id, return_code = run_azure_cli(get_nsg_cmd)
+        nsg_id, return_code = run_command(get_nsg_cmd)
         nsg_name = nsg_id.strip().split('/')[-1] if nsg_id else ''
 
         we_created_nsg = False
@@ -40,7 +40,7 @@ def block_network_access(resource_group: str, vnet: str, subnet_source: str, sub
             logger.info(f"Could not find existing NSG for subnet {subnet_source} in resource group {resource_group}. We'll have to create one.")
             nsg_name = f"{subnet_source}-chaostest-nsg"
             create_nsg_cmd = f"az network nsg create --resource-group {resource_group} --name {nsg_name}"
-            _, return_code = run_azure_cli(create_nsg_cmd)            
+            _, return_code = run_command(create_nsg_cmd)            
 
             if return_code != 0:
                 logger.error(f"Failed to create NSG for subnet {subnet_source} in resource group {resource_group}")
@@ -51,17 +51,17 @@ def block_network_access(resource_group: str, vnet: str, subnet_source: str, sub
             # Associate our new NSG with the subnet:
             logger.debug(f"Associating newly created NSG with subnet {subnet_source} in resource group {resource_group}")
             associate_nsg_cmd = f"az network vnet subnet update --resource-group {resource_group} --vnet-name {vnet} --name {subnet_source} --network-security-group {nsg_name}"
-            _, return_code = run_azure_cli(associate_nsg_cmd)
+            _, return_code = run_command(associate_nsg_cmd)
 
             if return_code != 0:
                 logger.error(f"Failed to associate NSG with subnet {subnet_source} in resource group {resource_group}")
                 return False
 
         # Get address prefixes for both subnets
-        subnet_source_prefix, error_a = run_azure_cli(
+        subnet_source_prefix, error_a = run_command(
             f"az network vnet subnet show --resource-group {resource_group} --vnet-name {vnet} --name {subnet_source} --query \"addressPrefix\" -o tsv"
         )
-        subnet_dest_prefix, error_b = run_azure_cli(
+        subnet_dest_prefix, error_b = run_command(
             f"az network vnet subnet show --resource-group {resource_group} --vnet-name {vnet} --name {subnet_dest} --query \"addressPrefix\" -o tsv"
         )
         
@@ -87,7 +87,7 @@ def block_network_access(resource_group: str, vnet: str, subnet_source: str, sub
             f"--destination-port-ranges '*' "
         )
         
-        _, return_code = run_azure_cli(create_rule_cmd)
+        _, return_code = run_command(create_rule_cmd)
         if return_code != 0:
             logger.error(f"Failed to create NSG rule {rule_name}")
             return False
@@ -106,7 +106,7 @@ def block_network_access(resource_group: str, vnet: str, subnet_source: str, sub
             f"--name {rule_name} "
         )
         
-        _, return_code = run_azure_cli(delete_rule_cmd)
+        _, return_code = run_command(delete_rule_cmd)
         if return_code != 0:
             logger.error(f"Failed to delete NSG rule {rule_name}")
             return False
@@ -116,14 +116,14 @@ def block_network_access(resource_group: str, vnet: str, subnet_source: str, sub
             logger.debug(f"Cleaning up: Deleting NSG {nsg_name} and disassociating it from subnet {subnet_source}")
             # Disassociate NSG
             disassociate_nsg_cmd = f"az network vnet subnet update --resource-group {resource_group} --vnet-name {vnet} --name {subnet_source} --network-security-group null"
-            _, return_code = run_azure_cli(disassociate_nsg_cmd)
+            _, return_code = run_command(disassociate_nsg_cmd)
             if return_code != 0:
                 logger.error(f"Failed to disassociate NSG from subnet {subnet_source}")
                 return False
             
             # Delete NSG
             delete_nsg_cmd = f"az network nsg delete --resource-group {resource_group} --name {nsg_name}"
-            _, return_code = run_azure_cli(delete_nsg_cmd)
+            _, return_code = run_command(delete_nsg_cmd)
             if return_code != 0:
                 logger.error(f"Failed to delete NSG {nsg_name}")
                 return False
