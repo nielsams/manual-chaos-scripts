@@ -79,7 +79,7 @@ def block_network_access(resource_group: str, vnet: str, subnet_source: str, sub
             f"--nsg-name {nsg_name} "
             f"--name {rule_name} "
             f"--priority 100 "
-            f"--direction Inbound "
+            f"--direction Outbound "
             f"--access Deny "
             f"--protocol '*' "
             f"--source-address-prefixes {subnet_source_prefix.strip()} "
