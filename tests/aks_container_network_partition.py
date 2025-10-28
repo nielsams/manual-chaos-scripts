@@ -90,7 +90,7 @@ def aks_container_network_partition(resource_group: str, cluster_name: str, name
             return False
 
         # Wait for the specified duration.
-        logger.debug(f"Network partition applied, waiting for {duration_seconds}...")
+        logger.info(f"Network partition applied, waiting for {duration_seconds}...")
         time.sleep(duration_seconds)
 
         # Clean up the experiment
