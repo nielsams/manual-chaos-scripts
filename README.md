@@ -12,7 +12,8 @@ A collection of Chaos experiments that can run standalone, used to validate spec
 
 ## Available Experiments
 
-- Kill AKS pods (gracefully or not) by label selector
-- Temporarily Block network connectivity between subnets
-- Shutdown AKS Nodes in a specific Availability Zone
-- Forced or graceful failover of a Postgres Flexible server 
+1) Kill AKS pods (gracefully or not) by label selector
+2) AKS Zone Down Simulation
+3) Temporarily Block network connectivity between subnets
+4) AKS Network Partition
+5) Forced or graceful failover of a Postgres Flexible server 

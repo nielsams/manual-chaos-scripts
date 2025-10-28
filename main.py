@@ -9,7 +9,7 @@ from tests.aks_kill_pods import aks_kill_pods
 from tests.aks_container_network_partition import aks_container_network_partition
 
 logging.basicConfig(
-    level=logging.DEBUG,
+    level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
@@ -18,26 +18,29 @@ logger = logging.getLogger(__name__)
 def main():
     """
     Main function to orchestrate zone redundancy experiments.
+
     """
-    
+    logger.info("\n\nStarting chaos experiments")    
+
     # Global Configuration
     resource_group = "test"
+
 
     #
     #
     # Experiment 1: Kill Pods in AKS Cluster
-    if False:
+    if True:
         # Update these config values:
         cluster_name = "niels-aks-test-1"
         namespace_name = "chaos-test"
         label_selector = "app=hello-world"
         graceful_stop = False
 
-        logger.info("Experiment 4: Kill pods in AKS cluster.")
+        logger.info("Experiment 1: Kill pods in AKS cluster.")
         success = aks_kill_pods(resource_group, cluster_name, namespace_name, label_selector, graceful_stop)
 
         if success:
-            logger.info("AKS pod kill experiment completed successfully")
+            logger.info("AKS pod kill experiment completed successfully\n\n")
         else:
             logger.error("AKS pod kill experiment failed")
     
@@ -45,7 +48,7 @@ def main():
     #
     #
     # Experiment 2: AKS Zone Down Simulation
-    if False:
+    if True:
         # Update these config values:
         cluster_name = "niels-aks-test-1"
 
@@ -53,7 +56,7 @@ def main():
         success = aks_zone_down(resource_group, cluster_name, target_zone="1")
 
         if success:
-            logger.info("AKS zone down simulation completed successfully")
+            logger.info("AKS zone down simulation completed successfully\n\n")
         else:
             logger.error("AKS zone down simulation failed")
 
@@ -61,18 +64,18 @@ def main():
     #
     #
     # Experiment 3: Block Network access between two subnets
-    if False:
+    if True:
         # Update these config values:
         vnet = "niels-test-vnet"
         subnet_source = "SubnetA"
         subnet_dest = "SubnetB"
         block_duration = 30  # seconds
 
-        logger.info("Experiment 1: Block network access between subnets.")
+        logger.info("Experiment 3: Block network access between subnets.")
         success = block_network_access(resource_group, vnet, subnet_source, subnet_dest, block_duration)
         
         if success:
-            logger.info("Network blocking experiment completed successfully")
+            logger.info("Network blocking experiment completed successfully\n\n")
         else:
             logger.error("Network blocking experiment failed")    
 
@@ -92,23 +95,23 @@ def main():
         success = aks_container_network_partition(resource_group, cluster_name, namespace_name, isolated_zone, block_duration)
 
         if success:
-            logger.info("AKS container network faults experiment completed successfully")
+            logger.info("AKS container network faults experiment completed successfully\n\n")
         else:
             logger.error("AKS container network faults experiment failed")
 
 
     #
     #
-    # Experiment 6: Postgres Failover
-    if False:
+    # Experiment 5: Postgres Failover
+    if True:
         # Update these config values:
         database_name = "niels-test-pgdb"
 
-        logger.info("Experiment 3: Simulate PostgreSQL failover.")
+        logger.info("Experiment 5: Simulate PostgreSQL failover.")
         success = postgres_failover(resource_group, database_name, forced_failover=True)
 
         if success:
-            logger.info("PostgreSQL failover completed successfully")
+            logger.info("PostgreSQL failover completed successfully\n\n")
         else:
             logger.error("PostgreSQL failover failed")
 

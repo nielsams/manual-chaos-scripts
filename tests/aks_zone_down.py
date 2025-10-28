@@ -80,7 +80,7 @@ def aks_zone_down(resource_group: str, cluster_name: str, target_zone: str) -> b
             vmss_names = [v.strip() for v in vmss_output.strip().split('\n') if v.strip()]
             
             if not vmss_names:
-                logger.info(f"No VMSS found for node pool '{nodepool['name']}', skipping...")
+                logger.debug(f"No VMSS found for node pool '{nodepool['name']}', skipping...")
                 continue
             
             vmss_name = vmss_names[0]
@@ -103,7 +103,7 @@ def aks_zone_down(resource_group: str, cluster_name: str, target_zone: str) -> b
             machine_names = [m.strip() for m in instances_output.strip().split('\n') if m.strip()]
             
             if machine_names:
-                logger.info(f"Deleting {len(machine_names)} instance(s) in zone {target_zone} for node pool '{nodepool['name']}' from cluster '{cluster_name}'")
+                logger.debug(f"Deleting {len(machine_names)} instance(s) in zone {target_zone} for node pool '{nodepool['name']}' from cluster '{cluster_name}'")
                 
                 # Delete the machines
                 delete_machines_cmd = (

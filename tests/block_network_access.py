@@ -70,7 +70,7 @@ def block_network_access(resource_group: str, vnet: str, subnet_source: str, sub
             return False
         
         logger.debug(f"Subnet {subnet_source} prefix: {subnet_source_prefix.strip()}, Subnet {subnet_dest} prefix: {subnet_dest_prefix.strip()}")
-        logger.info(f"Adding temporary rule to NSG: {nsg_name}")
+        logger.debug(f"Adding temporary rule to NSG: {nsg_name}")
         
         # Create NSG rule to deny traffic
         create_rule_cmd = (
@@ -128,7 +128,7 @@ def block_network_access(resource_group: str, vnet: str, subnet_source: str, sub
                 logger.error(f"Failed to delete NSG {nsg_name}")
                 return False
         
-        logger.info(f"Network Blocking finished - NSG rule deleted successfully.")
+        logger.debug(f"Network Blocking finished - NSG rule deleted successfully.")
         return True
         
     except Exception as e:
