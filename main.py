@@ -5,6 +5,7 @@ import sys
 from tests.block_network_access import block_network_access
 from tests.aks_zone_down import aks_zone_down
 from tests.postgres_failover import postgres_failover
+from tests.aks_kill_pods import aks_kill_pods
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -20,25 +21,25 @@ def main():
     
     # Global Configuration
     resource_group = "test"
-    
+
     #
     #
-    # Experiment 1: Block Network access between two subnets
-    if False:
+    # Experiment 1: Kill Pods in AKS Cluster
+    if True:
         # Update these config values:
-        vnet = "niels-test-vnet"
-        subnet_source = "SubnetA"
-        subnet_dest = "SubnetB"
-        block_duration = 30  # seconds
+        cluster_name = "niels-aks-test-1"
+        namespace_name = "chaos-test"
+        label_selector = "app=hello-world"
+        graceful_stop = False
 
-        logger.info("Experiment 1: Block network access between subnets.")
-        success = block_network_access(resource_group, vnet, subnet_source, subnet_dest, block_duration)
-        
+        logger.info("Experiment 4: Kill pods in AKS cluster.")
+        success = aks_kill_pods(resource_group, cluster_name, namespace_name, label_selector, graceful_stop)
+
         if success:
-            logger.info("Network blocking experiment completed successfully")
+            logger.info("AKS pod kill experiment completed successfully")
         else:
-            logger.error("Network blocking experiment failed")    
-
+            logger.error("AKS pod kill experiment failed")
+    
 
     #
     #
@@ -58,8 +59,27 @@ def main():
 
     #
     #
-    # Experiment 3: Postgres Failover
-    if True:
+    # Experiment 3: Block Network access between two subnets
+    if False:
+        # Update these config values:
+        vnet = "niels-test-vnet"
+        subnet_source = "SubnetA"
+        subnet_dest = "SubnetB"
+        block_duration = 30  # seconds
+
+        logger.info("Experiment 1: Block network access between subnets.")
+        success = block_network_access(resource_group, vnet, subnet_source, subnet_dest, block_duration)
+        
+        if success:
+            logger.info("Network blocking experiment completed successfully")
+        else:
+            logger.error("Network blocking experiment failed")    
+
+
+    #
+    #
+    # Experiment 6: Postgres Failover
+    if False:
         # Update these config values:
         database_name = "niels-test-pgdb"
 
@@ -70,6 +90,8 @@ def main():
             logger.info("PostgreSQL failover completed successfully")
         else:
             logger.error("PostgreSQL failover failed")
+
+
 
 
     #
