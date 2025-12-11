@@ -33,7 +33,7 @@ def run_command(command: str) -> tuple[str, int]:
     
 def get_aks_credentials(resource_group: str, cluster_name: str) -> bool:
     """
-    Get AKS cluster credentials using Azure CLI.
+    Get AKS cluster credentials using Azure CLI, or use existing kubectl context if available.
     
     Args:
         resource_group: The resource group of the AKS cluster
@@ -42,6 +42,26 @@ def get_aks_credentials(resource_group: str, cluster_name: str) -> bool:
     Returns:
         True if successful, False otherwise
     """
+    # Check if there's an existing kubectl context
+    check_context_cmd = "kubectl config current-context"
+    output, return_code = run_command(check_context_cmd)
+    
+    if return_code == 0 and output.strip():
+        current_context = output.strip()
+        logger.debug(f"Trying existing kubectl context: {current_context}")
+        
+        # Verify the context is accessible by checking cluster connectivity
+        verify_cmd = "kubectl cluster-info"
+        verify_output, verify_return_code = run_command(verify_cmd)
+        if verify_return_code == 0:
+            logger.debug(f"Successfully connected to cluster using existing context '{current_context}'")
+            return True
+        else:
+            logger.debug(f"Existing context '{current_context}' is not accessible, we can't use it")
+    
+    # No valid context exists, get new credentials from Azure
+    logger.debug(f"No valid kubectl context found, fetching AKS credentials for cluster '{cluster_name}'")
+
     get_credentials_cmd = (
         f"az aks get-credentials "
         f"--resource-group {resource_group} "
